@@ -1,1 +1,5 @@
 rootProject.name = 'apply-authorization-server'
+include 'authorization-server'
+include 'authorization-core'
+include 'resource-core'
+
