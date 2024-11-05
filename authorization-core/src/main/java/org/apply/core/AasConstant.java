@@ -9,5 +9,6 @@ public class AasConstant {
 
     public static final String LOGIN_PAGE = "/login";
     public static final String OAUTH_CONSENT_URI = "/oauth/consent";
+    public static final String HTTP_TENANT_ID = "http_tenant_id";
 
 }

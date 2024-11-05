@@ -1,6 +1,7 @@
 package org.apply.server.configuration;
 
 
+import org.apply.core.AasConstant;
 import org.apply.server.convert.*;
 import org.apply.server.repository.OAuth2AuthorizationGrantAuthorizationRepository;
 import org.apply.server.repository.OAuth2RegisteredClientRepository;
@@ -58,14 +59,15 @@ public class RedisConfiguration {
             OAuth2RegisteredClientRepository registeredClientRepository) {
 
         RegisteredClient messagingClient = RegisteredClient.withId(UUID.randomUUID().toString())
-                .clientId("messaging-client")
-                .clientSecret("{noop}secret")
+                .clientId("HG1795347877071736834")
+                .clientSecret(AasConstant.PASSWORD_ENCODER.encode("0b935bd0f1f3e27090812129a6ff04cf"))
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
                 .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
                 .redirectUri("http://127.0.0.1:8080/login/oauth2/code/messaging-client-oidc")
                 .redirectUri("http://127.0.0.1:8080/authorized")
+                .redirectUri("http://127.0.0.1:8080/index.html")
                 .postLogoutRedirectUri("http://127.0.0.1:8080/logged-out")
                 .scope(OidcScopes.OPENID)
                 .scope(OidcScopes.PROFILE)

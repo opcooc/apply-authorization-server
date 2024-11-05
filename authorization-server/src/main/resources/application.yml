@@ -52,3 +52,5 @@ logging:
     org.springframework.web: TRACE
     org.springframework.security: TRACE
     org.springframework.security.oauth2: TRACE
+    io.lettuce.core: off
+    org.springframework.data.redis.core: off

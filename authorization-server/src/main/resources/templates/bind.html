@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>绑定手机号</title>
+    <th:block th:replace="/common/common_css::css"/>
+    <th:block th:replace="/common/common_js::js"/>
+    <th:block th:replace="/common/common_captcha::captcha"/>
+</head>
+<body>
+<div class="wrapper">
+    <div class="centered-div" id="captcha-box"></div>
+    <!-- 页面头部 -->
+    <header th:replace="/common/common_header::header"></header>
+    <!-- 内容区域 -->
+    <div class="content-wrapper">
+        <img class="img-fluid mx-auto d-block mb-5"
+             src="https://themes.getbootstrap.com/wp-content/themes/bootstrap-marketplace/assets/images/elements/bootstrap-logo.svg"
+             alt="">
+
+        <form name="login_form" class="form-signin w-100 m-auto" method="post" th:action="@{/login}">
+            <div id="login_title" class="fw-medium fs-5 mb-3">绑定手机号</div>
+
+            <input type="hidden" name="login_type" value="federation_bind">
+            <input type="hidden" th:if="${tenantId}" name="http_tenant_id" th:value="${tenantId}">
+
+            <div class="mb-4">
+                <input type="text" id="phone" name="phone" value="" placeholder="请输入手机号" class="form-control" required>
+            </div>
+
+            <div class="input-suffix mb-4">
+                <input type="text" class="form-control" id="code" name="code" placeholder="请输入验证码">
+                <div class="suffix text-primary">获取验证码</div>
+            </div>
+
+            <div>
+                <!-- 登录 -->
+                <button class="mb-3 w-100 height-40 btn btn-primary btn-block" type="submit" role="link">
+                    登 录
+                </button>
+            </div>
+        </form>
+    </div>
+    <!-- 底部导航 -->
+    <footer th:replace="/common/common_footer::footer"></footer>
+</div>
+
+<script>
+    function callback(token) {
+        document.login_form.submit();
+    }
+
+</script>
+</body>
+</html>

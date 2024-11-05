@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>联合登录</title>
+</head>
+<body>
+<div>
+    <span th:text="${error ? '登陆失败...' : '登录成功...'}" th:remove="tag"/>
+<!--    <span th:text="${ticket}" th:remove="tag"/>-->
+</div>
+
+<script th:inline="javascript">
+    window.onload = function () {
+        var ticket = [[${ticket}]];
+        // 将获取到的ticket传递给父窗口
+        window.opener.postMessage({ticket: ticket}, window.location);
+        window.close();
+    }
+</script>
+</body>
+</html>

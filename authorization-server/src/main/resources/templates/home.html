@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>首页</title>
+    <th:block th:replace="/common/common_css::css"/>
+    <th:block th:replace="/common/common_js::js"/>
+</head>
+<body>
+<div class="wrapper">
+    <!-- 页面头部 -->
+    <header th:replace="/common/common_header::header"></header>
+    <!-- 内容区域 -->
+    <div class="content-wrapper">
+        <div class="row mb-5 height-65">
+            <div class="col text-center">
+                <span class="fw-bold" th:text="${user.username}"></span>
+            </div>
+        </div>
+    </div>
+    <!-- 底部导航 -->
+    <footer th:replace="/common/common_footer::footer"></footer>
+</div>
+</body>
+</html>

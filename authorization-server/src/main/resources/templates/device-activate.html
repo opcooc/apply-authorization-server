@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>设备激活</title>
+    <th:block th:replace="/common/common_css::css"/>
+    <th:block th:replace="/common/common_js::js"/>
+</head>
+<body>
+<div class="wrapper">
+    <!-- 页面头部 -->
+    <header th:replace="/common/common_header::header"></header>
+    <!-- 内容区域 -->
+    <div class="content-wrapper">
+        <div class="form-signin w-100 m-auto">
+            <div class="row mb-5 height-65">
+                <h1 class="text-primary text-center">设备激活</h1>
+            </div>
+            <div class="row mb-4">
+                <form th:action="${requestURI}" method="post">
+                    <div class="mb-4">
+                        <label for="user_code" class="form-label">激活码</label>
+                        <input type="text" id="user_code" name="user_code" class="form-control" required autofocus>
+                    </div>
+                    <div>
+                        <button type="submit" class="w-100 height-40 btn btn-primary">同意授权</button>
+                    </div>
+                </form>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <small>
+                        输入激活码以授权设备。
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 底部导航 -->
+    <footer th:replace="/common/common_footer::footer"></footer>
+</div>
+</body>
+</html>

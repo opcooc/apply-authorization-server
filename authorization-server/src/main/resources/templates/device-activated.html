@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>设备功激活成功</title>
+    <th:block th:replace="/common/common_css::css"/>
+    <th:block th:replace="/common/common_js::js"/>
+</head>
+<body>
+<div class="wrapper">
+    <!-- 页面头部 -->
+    <header th:replace="/common/common_header::header"></header>
+    <!-- 内容区域 -->
+    <div class="content-wrapper">
+        <div class="py-5 form-signin w-100 m-auto">
+            <div class="row text-center mb-4">
+                <i class="bi bi-check-circle-fill text-success" style="font-size: 150px;"></i>
+            </div>
+            <div class="row text-center">
+                <h3 class="fw-light">
+                    您已成功激活您的设备，请返回到您的设备以继续。
+                </h3>
+            </div>
+        </div>
+    </div>
+    <!-- 底部导航 -->
+    <footer th:replace="/common/common_footer::footer"></footer>
+</div>
+</body>
+</html>
+
