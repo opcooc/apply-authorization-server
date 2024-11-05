@@ -4,13 +4,14 @@ import java.security.Principal;
 import java.time.Instant;
 import java.util.Set;
 
+import lombok.Getter;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 
+@Getter
 public class OidcAuthorizationCodeGrantAuthorization extends OAuth2AuthorizationCodeGrantAuthorization {
 
 	private final IdToken idToken;
 
-	// @fold:on
 	public OidcAuthorizationCodeGrantAuthorization(String id, String registeredClientId, String principalName,
 			Set<String> authorizedScopes, AccessToken accessToken, RefreshToken refreshToken, Principal principal,
 			OAuth2AuthorizationRequest authorizationRequest, AuthorizationCode authorizationCode, String state,
@@ -20,10 +21,7 @@ public class OidcAuthorizationCodeGrantAuthorization extends OAuth2Authorization
 		this.idToken = idToken;
 	}
 
-	public IdToken getIdToken() {
-		return this.idToken;
-	}
-
+	@Getter
 	public static class IdToken extends AbstractToken {
 
 		private final ClaimsHolder claims;
@@ -34,11 +32,6 @@ public class OidcAuthorizationCodeGrantAuthorization extends OAuth2Authorization
 			this.claims = claims;
 		}
 
-		public ClaimsHolder getClaims() {
-			return this.claims;
-		}
-
 	}
-	// @fold:off
 
 }

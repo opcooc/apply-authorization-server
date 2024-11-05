@@ -1,5 +1,6 @@
 package org.apply.server.service;
 
+import lombok.RequiredArgsConstructor;
 import org.apply.server.entity.OAuth2RegisteredClient;
 import org.apply.server.repository.OAuth2RegisteredClientRepository;
 import org.springframework.lang.Nullable;
@@ -7,14 +8,10 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.util.Assert;
 
+@RequiredArgsConstructor
 public class RedisRegisteredClientRepository implements RegisteredClientRepository {
 
 	private final OAuth2RegisteredClientRepository registeredClientRepository;
-
-	public RedisRegisteredClientRepository(OAuth2RegisteredClientRepository registeredClientRepository) {
-		Assert.notNull(registeredClientRepository, "registeredClientRepository cannot be null");
-		this.registeredClientRepository = registeredClientRepository;
-	}
 
 	@Override
 	public void save(RegisteredClient registeredClient) {

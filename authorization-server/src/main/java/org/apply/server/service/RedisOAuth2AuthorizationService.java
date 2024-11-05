@@ -1,5 +1,6 @@
 package org.apply.server.service;
 
+import lombok.RequiredArgsConstructor;
 import org.apply.server.entity.OAuth2AuthorizationGrantAuthorization;
 import org.apply.server.repository.OAuth2AuthorizationGrantAuthorizationRepository;
 import org.springframework.lang.Nullable;
@@ -12,20 +13,12 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.util.Assert;
 
+@RequiredArgsConstructor
 public class RedisOAuth2AuthorizationService implements OAuth2AuthorizationService {
 
 	private final RegisteredClientRepository registeredClientRepository;
 
 	private final OAuth2AuthorizationGrantAuthorizationRepository authorizationGrantAuthorizationRepository;
-
-	public RedisOAuth2AuthorizationService(RegisteredClientRepository registeredClientRepository,
-			OAuth2AuthorizationGrantAuthorizationRepository authorizationGrantAuthorizationRepository) {
-		Assert.notNull(registeredClientRepository, "registeredClientRepository cannot be null");
-		Assert.notNull(authorizationGrantAuthorizationRepository,
-				"authorizationGrantAuthorizationRepository cannot be null");
-		this.registeredClientRepository = registeredClientRepository;
-		this.authorizationGrantAuthorizationRepository = authorizationGrantAuthorizationRepository;
-	}
 
 	@Override
 	public void save(OAuth2Authorization authorization) {
@@ -45,9 +38,8 @@ public class RedisOAuth2AuthorizationService implements OAuth2AuthorizationServi
 	@Override
 	public OAuth2Authorization findById(String id) {
 		Assert.hasText(id, "id cannot be empty");
-		return this.authorizationGrantAuthorizationRepository.findById(id)
-			.map(this::toOAuth2Authorization)
-			.orElse(null);
+		return this.authorizationGrantAuthorizationRepository.findById(id).map(this::toOAuth2Authorization)
+				.orElse(null);
 	}
 
 	@Nullable
@@ -108,7 +100,7 @@ public class RedisOAuth2AuthorizationService implements OAuth2AuthorizationServi
 	private OAuth2Authorization toOAuth2Authorization(
 			OAuth2AuthorizationGrantAuthorization authorizationGrantAuthorization) {
 		RegisteredClient registeredClient = this.registeredClientRepository
-			.findById(authorizationGrantAuthorization.getRegisteredClientId());
+				.findById(authorizationGrantAuthorization.getRegisteredClientId());
 		OAuth2Authorization.Builder builder = OAuth2Authorization.withRegisteredClient(registeredClient);
 		ModelMapper.mapOAuth2AuthorizationGrantAuthorization(authorizationGrantAuthorization, builder);
 		return builder.build();

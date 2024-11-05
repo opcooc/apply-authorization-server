@@ -1,5 +1,6 @@
 package org.apply.server.service;
 
+import lombok.RequiredArgsConstructor;
 import org.apply.server.entity.OAuth2UserConsent;
 import org.apply.server.repository.OAuth2UserConsentRepository;
 import org.springframework.lang.Nullable;
@@ -7,14 +8,10 @@ import org.springframework.security.oauth2.server.authorization.OAuth2Authorizat
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationConsentService;
 import org.springframework.util.Assert;
 
+@RequiredArgsConstructor
 public class RedisOAuth2AuthorizationConsentService implements OAuth2AuthorizationConsentService {
 
 	private final OAuth2UserConsentRepository userConsentRepository;
-
-	public RedisOAuth2AuthorizationConsentService(OAuth2UserConsentRepository userConsentRepository) {
-		Assert.notNull(userConsentRepository, "userConsentRepository cannot be null");
-		this.userConsentRepository = userConsentRepository;
-	}
 
 	@Override
 	public void save(OAuth2AuthorizationConsent authorizationConsent) {
