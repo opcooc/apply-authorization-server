@@ -5,8 +5,9 @@ import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import org.apply.server.support.device.DeviceClientAuthenticationConverter;
+import org.apply.server.support.device.DeviceClientAuthenticationProvider;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.apply.server.jose.Jwks;
 import org.apply.core.AasConstant;
@@ -16,8 +17,10 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
+import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
@@ -27,7 +30,9 @@ public class AuthorizationServerConfiguration {
 
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
-    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http,
+                                                                      AuthorizationServerSettings authorizationServerSettings,
+                                                                      RegisteredClientRepository registeredClientRepository) throws Exception {
 
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
         OAuth2AuthorizationServerConfigurer httpConfigurer = http.getConfigurer(OAuth2AuthorizationServerConfigurer.class);
@@ -41,7 +46,6 @@ public class AuthorizationServerConfiguration {
         // 设置设备码端点
         httpConfigurer.deviceAuthorizationEndpoint(customizer -> {
             customizer.verificationUri("/activate");
-            customizer.deviceAuthorizationResponseHandler(new DeviceAuthorizationSuccessHandler());
         });
 
         // 设置设备码端点
@@ -51,16 +55,13 @@ public class AuthorizationServerConfiguration {
 
         // 设置设备码端点
         DeviceClientAuthenticationConverter deviceClientAuthenticationConverter =
-                new DeviceClientAuthenticationConverter(
-                        authorizationServerSettings.getDeviceAuthorizationEndpoint());
+                new DeviceClientAuthenticationConverter(authorizationServerSettings.getDeviceAuthorizationEndpoint());
         DeviceClientAuthenticationProvider deviceClientAuthenticationProvider =
                 new DeviceClientAuthenticationProvider(registeredClientRepository);
+
         httpConfigurer.clientAuthentication(customizer -> {
-            String deviceAuthorizationEndpointUri = authorizationServerSettings.isMultipleIssuersAllowed()
-                    ? "/**" + authorizationServerSettings.getDeviceAuthorizationEndpoint()
-                    : authorizationServerSettings.getDeviceAuthorizationEndpoint();
-            customizer.authenticationConverter(new DeviceClientAuthenticationConverter(deviceAuthorizationEndpointUri));
-            customizer.authenticationProvider(new DeviceClientAuthenticationProvider(appService));
+            customizer.authenticationConverter(deviceClientAuthenticationConverter);
+            customizer.authenticationProvider(deviceClientAuthenticationProvider);
         });
 
         http.exceptionHandling(customizer -> {
@@ -68,6 +69,10 @@ public class AuthorizationServerConfiguration {
                     new LoginUrlAuthenticationEntryPoint(AasConstant.LOGIN_PAGE),
                     new MediaTypeRequestMatcher(MediaType.TEXT_HTML)
             );
+        });
+
+        http.oauth2ResourceServer(customizer -> {
+            customizer.jwt(Customizer.withDefaults());
         });
 
         return http.build();
