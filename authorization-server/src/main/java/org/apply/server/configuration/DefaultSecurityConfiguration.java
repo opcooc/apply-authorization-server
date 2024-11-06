@@ -59,6 +59,7 @@ public class DefaultSecurityConfiguration {
     @Bean
     public UserDetailsService users() {
         AasUser user = new AasUser();
+        user.setUserId("userId");
         user.setUsername("user1");
         user.setPassword(AasConstant.PASSWORD_ENCODER.encode("password"));
         user.setAuthorities(Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
