@@ -14,11 +14,6 @@ import java.util.TimeZone;
 
 public class JsonUtils {
 
-    private JsonUtils() {
-        // 禁止实例化工具类
-        throw new UnsupportedOperationException("Utility classes cannot be instantiated.");
-    }
-
     public static ObjectMapper objectMapper = JsonMapper.builder()
             .defaultLocale(Locale.CHINA)
             .defaultTimeZone(TimeZone.getTimeZone("GMT+8"))

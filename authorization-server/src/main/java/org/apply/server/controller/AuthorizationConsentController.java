@@ -41,7 +41,7 @@ public class AuthorizationConsentController {
             }
             BasicScope basicScope = BasicScope.fromScope(requestedScope);
             if (basicScope == null) {
-                throw new RuntimeException("MultipleIssuersAllowed is set up, but there is no tenant id");
+                throw new RuntimeException("basicScope is null");
             }
             scopeWithDescriptions.add(basicScope);
         }
