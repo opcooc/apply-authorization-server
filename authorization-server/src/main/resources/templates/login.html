@@ -52,7 +52,6 @@
 
             <input type="hidden" id="login_type" name="login_type" value="username">
             <input type="hidden" id="login_cid" name="cid" value="">
-            <input type="hidden" th:if="${tenantId}" name="http_tenant_id" th:value="${tenantId}">
 
             <div id="login_username">
                 <div class="mb-4">
@@ -117,7 +116,6 @@
         </form>
         <form name="federation_form" method="post" th:action="@{/login}">
             <input type="hidden" name="login_type" value="federation">
-            <input type="hidden" th:if="${tenantId}" name="http_tenant_id" th:value="${tenantId}">
         </form>
     </div>
     <!-- 底部导航 -->

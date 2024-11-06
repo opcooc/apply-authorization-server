@@ -54,3 +54,4 @@ logging:
     org.springframework.security.oauth2: TRACE
     io.lettuce.core: off
     org.springframework.data.redis.core: off
+    org.springframework.session.data.redis: off

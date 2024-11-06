@@ -5,6 +5,7 @@ import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.apply.server.jose.Jwks;
@@ -31,16 +32,12 @@ public class AuthorizationServerConfiguration {
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
         OAuth2AuthorizationServerConfigurer httpConfigurer = http.getConfigurer(OAuth2AuthorizationServerConfigurer.class);
 
-        // 设置自定义用户确认授权页
         httpConfigurer.authorizationEndpoint(customizer -> {
             customizer.consentPage(AasConstant.OAUTH_CONSENT_URI);
         });
 
-        // 开启OpenID Connect 1.0协议相关端点
-        httpConfigurer.oidc(oidc -> {
-        });
+        httpConfigurer.oidc(Customizer.withDefaults());
 
-        // 当未登录时访问认证端点时重定向至login页面
         http.exceptionHandling(customizer -> {
             customizer.defaultAuthenticationEntryPointFor(
                     new LoginUrlAuthenticationEntryPoint(AasConstant.LOGIN_PAGE),

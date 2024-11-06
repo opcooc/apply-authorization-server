@@ -6,9 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author shenqicheng
@@ -125,10 +123,10 @@ public class AasUser implements UserDetails, Serializable {
      */
     private Set<String> tenantIds;
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.emptySet();
-    }
+    /**
+     * 权限
+     */
+    private List<GrantedAuthority> authorities = new ArrayList<>();
 
     @Override
     public boolean isEnabled() {
