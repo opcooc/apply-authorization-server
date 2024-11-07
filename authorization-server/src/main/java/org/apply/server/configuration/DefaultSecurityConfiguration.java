@@ -1,9 +1,9 @@
 package org.apply.server.configuration;
 
-import lombok.RequiredArgsConstructor;
 import org.apply.core.AasConstant;
 import org.apply.core.userdetails.AasUser;
 import org.apply.server.event.AuthenticationEventListener;
+import org.apply.server.support.filter.PreCaptchaVerifyFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -14,18 +14,16 @@ import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.util.Collections;
 
 @EnableWebSecurity
-@RequiredArgsConstructor
 @Configuration(proxyBeanMethods = false)
 public class DefaultSecurityConfiguration {
 
-    private final SessionRegistry sessionRegistry;
-
     @Bean
-    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http, SessionRegistry sessionRegistry) throws Exception {
 
         http.authorizeHttpRequests(customizer -> {
             customizer.requestMatchers("/assets/**", AasConstant.OAUTH_LOGIN_URI)
@@ -39,15 +37,15 @@ public class DefaultSecurityConfiguration {
             customizer.failureForwardUrl(AasConstant.OAUTH_LOGIN_URI);
         });
 
+        http.sessionManagement(sessionManagement -> sessionManagement.sessionConcurrency(sessionConcurrency -> {
+            sessionConcurrency.maximumSessions(1);
+            sessionConcurrency.sessionRegistry(sessionRegistry);
+            sessionConcurrency.expiredUrl(AasConstant.OAUTH_LOGIN_URI);
+        }));
+
         http.logout(Customizer.withDefaults());
 
-        http.sessionManagement(sessionManagement -> {
-            sessionManagement.sessionConcurrency(sessionConcurrency -> {
-                sessionConcurrency.maximumSessions(1);
-                sessionConcurrency.sessionRegistry(sessionRegistry);
-                sessionConcurrency.expiredUrl(AasConstant.OAUTH_LOGIN_URI);
-            });
-        });
+        http.addFilterBefore(new PreCaptchaVerifyFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

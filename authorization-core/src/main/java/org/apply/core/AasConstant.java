@@ -14,4 +14,6 @@ public class AasConstant {
     public static final String OAUTH_ACTIVATE_URI = "/activate";
     public static final String OAUTH_ACTIVATED_URI = "/activated";
 
+    public static final String PRE_CAPTCHA_VERIFY_PARAM = "pcv_id";
+
 }

@@ -55,8 +55,7 @@ public class RedisConfiguration {
     }
 
     @Bean
-    public RedisRegisteredClientRepository registeredClientRepository(
-            OAuth2RegisteredClientRepository registeredClientRepository) {
+    public RedisRegisteredClientRepository registeredClientRepository(OAuth2RegisteredClientRepository registeredClientRepository) {
 
         RegisteredClient messagingClient = RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientId("HG1795347877071736834")
@@ -77,8 +76,6 @@ public class RedisConfiguration {
                 .scope(OidcScopes.PROFILE)
                 .clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
                 .build();
-
-
 
         RegisteredClient tokenExchangeClient = RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientId("token-client")
@@ -121,8 +118,7 @@ public class RedisConfiguration {
     @Bean
     public RedisOAuth2AuthorizationService authorizationService(RegisteredClientRepository registeredClientRepository,
                                                                 OAuth2AuthorizationGrantAuthorizationRepository authorizationGrantAuthorizationRepository) {
-        return new RedisOAuth2AuthorizationService(registeredClientRepository,
-                authorizationGrantAuthorizationRepository);
+        return new RedisOAuth2AuthorizationService(registeredClientRepository, authorizationGrantAuthorizationRepository);
     }
 
     @Bean

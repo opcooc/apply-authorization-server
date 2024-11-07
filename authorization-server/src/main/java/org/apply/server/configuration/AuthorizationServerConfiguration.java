@@ -43,17 +43,14 @@ public class AuthorizationServerConfiguration {
 
         httpConfigurer.oidc(Customizer.withDefaults());
 
-        // 设置设备码端点
         httpConfigurer.deviceAuthorizationEndpoint(customizer -> {
             customizer.verificationUri(AasConstant.OAUTH_ACTIVATE_URI);
         });
 
-        // 设置设备码端点
         httpConfigurer.deviceVerificationEndpoint(customizer -> {
             customizer.consentPage(AasConstant.OAUTH_CONSENT_URI);
         });
 
-        // 设置设备码端点
         DeviceClientAuthenticationConverter deviceClientAuthenticationConverter =
                 new DeviceClientAuthenticationConverter(authorizationServerSettings.getDeviceAuthorizationEndpoint());
         DeviceClientAuthenticationProvider deviceClientAuthenticationProvider =
