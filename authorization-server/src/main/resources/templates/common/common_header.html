@@ -15,7 +15,9 @@
 
                 <ul th:if="${user != null and user.username != null}" class="navbar-nav mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="btn" href="/logout">注销</a>
+                        <form class="d-flex" th:action="@{/logout}" method="post">
+                            <button class="btn" type="submit">注销</button>
+                        </form>
                     </li>
                 </ul>
 

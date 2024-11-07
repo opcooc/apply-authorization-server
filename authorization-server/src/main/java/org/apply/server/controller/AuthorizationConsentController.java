@@ -53,10 +53,10 @@ public class AuthorizationConsentController {
         model.addAttribute("principalName", authentication.getName());
         model.addAttribute("userCode", userCode);
 
-        String requestURI = StringUtils.hasText(userCode)
+        String requestUri = StringUtils.hasText(userCode)
                 ? authorizationServerSettings.getDeviceVerificationEndpoint()
                 : authorizationServerSettings.getAuthorizationEndpoint();
-        model.addAttribute("requestURI", requestURI);
+        model.addAttribute("requestURI", requestUri);
 
         return "consent";
     }
