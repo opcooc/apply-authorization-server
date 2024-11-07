@@ -1,6 +1,7 @@
 package org.apply.server.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.apply.core.AasConstant;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.stereotype.Controller;
@@ -14,26 +15,26 @@ public class DeviceController {
 
 	private final AuthorizationServerSettings authorizationServerSettings;
 
-	@GetMapping("/activate")
+	@GetMapping(AasConstant.OAUTH_ACTIVATE_URI)
 	public String activate(Authentication authentication, Model model,
 						   @RequestParam(value = "user_code", required = false) String userCode) {
-		String requestURI = authorizationServerSettings.getDeviceVerificationEndpoint();
+		String requestUri = authorizationServerSettings.getDeviceVerificationEndpoint();
 
 		if (userCode != null) {
-			return "redirect:" + requestURI + "?user_code=" + userCode;
+			return "redirect:" + requestUri + "?user_code=" + userCode;
 		}
 
 		model.addAttribute("user", authentication.getPrincipal());
-		model.addAttribute("requestURI", requestURI);
+		model.addAttribute("requestURI", requestUri);
 		return "device-activate";
 	}
 
-	@GetMapping("/activated")
+	@GetMapping(AasConstant.OAUTH_ACTIVATED_URI)
 	public String activated() {
 		return "device-activated";
 	}
 
-	@GetMapping(value = "/", params = "success")
+	@GetMapping(value = AasConstant.OAUTH_HOME_URI, params = "success")
 	public String success() {
 		return "device-activated";
 	}

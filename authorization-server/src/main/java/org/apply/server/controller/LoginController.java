@@ -1,5 +1,6 @@
 package org.apply.server.controller;
 
+import org.apply.core.AasConstant;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -9,7 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class LoginController {
 
-    @GetMapping("/login")
+    @GetMapping(AasConstant.OAUTH_LOGIN_URI)
     public String login(Authentication authentication, Model model) {
 
         if (authentication instanceof UsernamePasswordAuthenticationToken) {

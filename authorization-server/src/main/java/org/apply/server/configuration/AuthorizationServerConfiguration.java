@@ -45,7 +45,7 @@ public class AuthorizationServerConfiguration {
 
         // 设置设备码端点
         httpConfigurer.deviceAuthorizationEndpoint(customizer -> {
-            customizer.verificationUri("/activate");
+            customizer.verificationUri(AasConstant.OAUTH_ACTIVATE_URI);
         });
 
         // 设置设备码端点
@@ -66,7 +66,7 @@ public class AuthorizationServerConfiguration {
 
         http.exceptionHandling(customizer -> {
             customizer.defaultAuthenticationEntryPointFor(
-                    new LoginUrlAuthenticationEntryPoint(AasConstant.LOGIN_PAGE),
+                    new LoginUrlAuthenticationEntryPoint(AasConstant.OAUTH_LOGIN_URI),
                     new MediaTypeRequestMatcher(MediaType.TEXT_HTML)
             );
         });

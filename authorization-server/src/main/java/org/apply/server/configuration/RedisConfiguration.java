@@ -65,26 +65,20 @@ public class RedisConfiguration {
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
                 .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+
+                .clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
+                .authorizationGrantType(AuthorizationGrantType.DEVICE_CODE)
+
                 .redirectUri("http://127.0.0.1:8080/login/oauth2/code/messaging-client-oidc")
                 .redirectUri("http://127.0.0.1:8080/authorized")
                 .redirectUri("http://127.0.0.1:8080/index.html")
                 .postLogoutRedirectUri("http://127.0.0.1:8080/logged-out")
                 .scope(OidcScopes.OPENID)
                 .scope(OidcScopes.PROFILE)
-                .scope("message.read")
-                .scope("message.write")
-                .scope("user.read")
                 .clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
                 .build();
 
-        RegisteredClient deviceClient = RegisteredClient.withId(UUID.randomUUID().toString())
-                .clientId("device-messaging-client")
-                .clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
-                .authorizationGrantType(AuthorizationGrantType.DEVICE_CODE)
-                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-                .scope("message.read")
-                .scope("message.write")
-                .build();
+
 
         RegisteredClient tokenExchangeClient = RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientId("token-client")
@@ -118,7 +112,6 @@ public class RedisConfiguration {
         // Save registered client's in db as if in-memory
         RedisRegisteredClientRepository redisRegisteredClientRepository = new RedisRegisteredClientRepository(registeredClientRepository);
         redisRegisteredClientRepository.save(messagingClient);
-        redisRegisteredClientRepository.save(deviceClient);
         redisRegisteredClientRepository.save(tokenExchangeClient);
         redisRegisteredClientRepository.save(mtlsDemoClient);
 

@@ -2,6 +2,7 @@ package org.apply.server.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.apply.core.AasConstant;
 import org.apply.core.userdetails.AasUser;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.security.core.Authentication;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequiredArgsConstructor
 public class DefaultHomeController implements ErrorController {
 
-    @RequestMapping("/")
+    @RequestMapping(AasConstant.OAUTH_HOME_URI)
     public String home(Authentication authentication, Model model, HttpServletRequest request) {
         User user = (User) authentication.getPrincipal();
         model.addAttribute("user", user);
