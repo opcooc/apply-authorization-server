@@ -1,4 +1,4 @@
-package org.apply.server.support.device;
+package org.springframework.security.oauth2.server.authorization.authentication;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

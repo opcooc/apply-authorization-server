@@ -5,8 +5,8 @@ import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
-import org.apply.server.support.device.DeviceClientAuthenticationConverter;
-import org.apply.server.support.device.DeviceClientAuthenticationProvider;
+import org.springframework.security.oauth2.server.authorization.web.authentication.DeviceClientAuthenticationConverter;
+import org.springframework.security.oauth2.server.authorization.authentication.DeviceClientAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.apply.server.support.jose.Jwks;
@@ -51,14 +51,14 @@ public class AuthorizationServerConfiguration {
             customizer.consentPage(AasConstant.OAUTH_CONSENT_URI);
         });
 
-        DeviceClientAuthenticationConverter deviceClientAuthenticationConverter =
+        DeviceClientAuthenticationConverter DeviceClientAuthenticationConverter =
                 new DeviceClientAuthenticationConverter(authorizationServerSettings.getDeviceAuthorizationEndpoint());
-        DeviceClientAuthenticationProvider deviceClientAuthenticationProvider =
+        DeviceClientAuthenticationProvider DeviceClientAuthenticationProvider =
                 new DeviceClientAuthenticationProvider(registeredClientRepository);
 
         httpConfigurer.clientAuthentication(customizer -> {
-            customizer.authenticationConverter(deviceClientAuthenticationConverter);
-            customizer.authenticationProvider(deviceClientAuthenticationProvider);
+            customizer.authenticationConverter(DeviceClientAuthenticationConverter);
+            customizer.authenticationProvider(DeviceClientAuthenticationProvider);
         });
 
         http.exceptionHandling(customizer -> {
