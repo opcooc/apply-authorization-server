@@ -30,8 +30,6 @@ public class SmsGrantAuthenticationConverter implements AuthenticationConverter 
 
         MultiValueMap<String, String> parameters = OAuth2EndpointUtils.getFormParameters(request);
 
-        Authentication clientPrincipal = SecurityContextHolder.getContext().getAuthentication();
-
         String scope = parameters.getFirst(OAuth2ParameterNames.SCOPE);
         if (StringUtils.hasText(scope) && parameters.get(OAuth2ParameterNames.SCOPE).size() != 1) {
             OAuth2EndpointUtils.throwError(OAuth2ErrorCodes.INVALID_REQUEST, OAuth2ParameterNames.SCOPE,
@@ -40,6 +38,12 @@ public class SmsGrantAuthenticationConverter implements AuthenticationConverter 
         Set<String> requestedScopes = null;
         if (StringUtils.hasText(scope)) {
             requestedScopes = new HashSet<>(Arrays.asList(StringUtils.delimitedListToStringArray(scope, " ")));
+        }
+
+        String clientId = parameters.getFirst(OAuth2ParameterNames.CLIENT_ID);
+        if (!StringUtils.hasText(clientId) || parameters.get(OAuth2ParameterNames.CLIENT_ID).size() != 1) {
+            OAuth2EndpointUtils.throwError(OAuth2ErrorCodes.INVALID_REQUEST, OAuth2ParameterNames.CLIENT_ID,
+                    OAuth2EndpointUtils.ACCESS_TOKEN_REQUEST_ERROR_URI);
         }
 
         String phone = parameters.getFirst(AasConstant.OAUTH_PARAMETER_NAME_PHONE);
@@ -59,12 +63,13 @@ public class SmsGrantAuthenticationConverter implements AuthenticationConverter 
             if (!key.equals(OAuth2ParameterNames.GRANT_TYPE)
                     && !key.equals(AasConstant.OAUTH_PARAMETER_NAME_PHONE)
                     && !key.equals(AasConstant.OAUTH_PARAMETER_NAME_SMS_CAPTCHA)
+                    && !key.equals(OAuth2ParameterNames.CLIENT_ID)
                     && !key.equals(OAuth2ParameterNames.SCOPE)) {
                 additionalParameters.put(key, (value.size() == 1) ? value.get(0) : value.toArray(new String[0]));
             }
         });
 
-        return new SmsCaptchaGrantAuthenticationToken(phone, smsCaptcha, requestedScopes, clientPrincipal, additionalParameters);
+        return new SmsCaptchaGrantAuthenticationToken(phone, smsCaptcha, requestedScopes, clientId, additionalParameters);
     }
 
 }

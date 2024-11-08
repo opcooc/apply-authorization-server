@@ -4,10 +4,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.apply.core.AasConstant;
 import org.springframework.lang.Nullable;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
-import org.springframework.security.oauth2.server.authorization.authentication.PasswordAuthenticationToken;
+import org.springframework.security.oauth2.server.authorization.authentication.PasswordGrantAuthenticationToken;
 import org.springframework.security.web.authentication.AuthenticationConverter;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
@@ -18,7 +17,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class PasswordAuthenticationConverter implements AuthenticationConverter {
+public class PasswordGrantAuthenticationConverter implements AuthenticationConverter {
 
     @Nullable
     @Override
@@ -31,8 +30,6 @@ public class PasswordAuthenticationConverter implements AuthenticationConverter 
 
         MultiValueMap<String, String> parameters = OAuth2EndpointUtils.getFormParameters(request);
 
-        Authentication clientPrincipal = SecurityContextHolder.getContext().getAuthentication();
-
         String scope = parameters.getFirst(OAuth2ParameterNames.SCOPE);
         if (StringUtils.hasText(scope) && parameters.get(OAuth2ParameterNames.SCOPE).size() != 1) {
             OAuth2EndpointUtils.throwError(OAuth2ErrorCodes.INVALID_REQUEST, OAuth2ParameterNames.SCOPE,
@@ -41,6 +38,12 @@ public class PasswordAuthenticationConverter implements AuthenticationConverter 
         Set<String> requestedScopes = null;
         if (StringUtils.hasText(scope)) {
             requestedScopes = new HashSet<>(Arrays.asList(StringUtils.delimitedListToStringArray(scope, " ")));
+        }
+
+        String clientId = parameters.getFirst(OAuth2ParameterNames.CLIENT_ID);
+        if (!StringUtils.hasText(clientId) || parameters.get(OAuth2ParameterNames.CLIENT_ID).size() != 1) {
+            OAuth2EndpointUtils.throwError(OAuth2ErrorCodes.INVALID_REQUEST, OAuth2ParameterNames.CLIENT_ID,
+                    OAuth2EndpointUtils.ACCESS_TOKEN_REQUEST_ERROR_URI);
         }
 
         String username = parameters.getFirst(OAuth2ParameterNames.USERNAME);
@@ -60,12 +63,13 @@ public class PasswordAuthenticationConverter implements AuthenticationConverter 
             if (!key.equals(OAuth2ParameterNames.GRANT_TYPE)
                     && !key.equals(OAuth2ParameterNames.USERNAME)
                     && !key.equals(OAuth2ParameterNames.PASSWORD)
+                    && !key.equals(OAuth2ParameterNames.CLIENT_ID)
                     && !key.equals(OAuth2ParameterNames.SCOPE)) {
                 additionalParameters.put(key, (value.size() == 1) ? value.get(0) : value.toArray(new String[0]));
             }
         });
 
-        return new PasswordAuthenticationToken(username, password, requestedScopes, clientPrincipal, additionalParameters);
+        return new PasswordGrantAuthenticationToken(username, password, requestedScopes, clientId, additionalParameters);
     }
 
 }
