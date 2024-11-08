@@ -9,7 +9,7 @@ import org.apply.server.support.device.DeviceClientAuthenticationConverter;
 import org.apply.server.support.device.DeviceClientAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.apply.server.jose.Jwks;
+import org.apply.server.support.jose.Jwks;
 import org.apply.core.AasConstant;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
