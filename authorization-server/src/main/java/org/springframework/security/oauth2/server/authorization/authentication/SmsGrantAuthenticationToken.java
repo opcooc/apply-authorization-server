@@ -11,14 +11,14 @@ import java.util.Map;
 import java.util.Set;
 
 @Getter
-public class SmsCaptchaGrantAuthenticationToken extends CustomGrantAuthenticationToken {
+public class SmsGrantAuthenticationToken extends CustomGrantAuthenticationToken {
 
     private final String phone;
     private final String smsCaptcha;
     private final Set<String> scopes;
 
-    public SmsCaptchaGrantAuthenticationToken(String phone, String smsCaptcha, Set<String> scopes, String clientId,
-                                              @Nullable Map<String, Object> additionalParameters) {
+    public SmsGrantAuthenticationToken(String phone, String smsCaptcha, Set<String> scopes, String clientId,
+                                       @Nullable Map<String, Object> additionalParameters) {
         super(AasConstant.SMS, clientId, additionalParameters);
         Assert.hasText(phone, "phone cannot be empty");
         Assert.hasText(smsCaptcha, "smsCaptcha cannot be empty");

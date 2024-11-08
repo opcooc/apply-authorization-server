@@ -21,17 +21,4 @@ public class OidcAuthorizationCodeGrantAuthorization extends OAuth2Authorization
 		this.idToken = idToken;
 	}
 
-	@Getter
-	public static class IdToken extends AbstractToken {
-
-		private final ClaimsHolder claims;
-
-		public IdToken(String tokenValue, Instant issuedAt, Instant expiresAt, boolean invalidated,
-				ClaimsHolder claims) {
-			super(tokenValue, issuedAt, expiresAt, invalidated);
-			this.claims = claims;
-		}
-
-	}
-
 }

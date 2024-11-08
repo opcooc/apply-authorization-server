@@ -2,6 +2,7 @@ package org.apply.server.service;
 
 import java.security.Principal;
 
+import org.apply.core.AasConstant;
 import org.apply.server.entity.*;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
@@ -77,6 +78,16 @@ final class ModelMapper {
 		else if (AuthorizationGrantType.TOKEN_EXCHANGE.equals(authorization.getAuthorizationGrantType())) {
 			return convertOAuth2TokenExchangeGrantAuthorization(authorization);
 		}
+		else if (AasConstant.PASSWORD.equals(authorization.getAuthorizationGrantType())) {
+			return authorization.getAuthorizedScopes().contains(OidcScopes.OPENID)
+					? convertOidcAuthorizationPasswordGrantAuthorization(authorization)
+					: convertOAuth2AuthorizationPasswordGrantAuthorization(authorization);
+		}
+		else if (AasConstant.SMS.equals(authorization.getAuthorizationGrantType())) {
+			return authorization.getAuthorizedScopes().contains(OidcScopes.OPENID)
+					? convertOidcAuthorizationSmsGrantAuthorization(authorization)
+					: convertOAuth2AuthorizationSmsGrantAuthorization(authorization);
+		}
 		return null;
 	}
 
@@ -86,13 +97,37 @@ final class ModelMapper {
 				authorization);
 		OAuth2AuthorizationGrantAuthorization.AccessToken accessToken = extractAccessToken(authorization);
 		OAuth2AuthorizationGrantAuthorization.RefreshToken refreshToken = extractRefreshToken(authorization);
-		OidcAuthorizationCodeGrantAuthorization.IdToken idToken = extractIdToken(authorization);
+		IdToken idToken = extractIdToken(authorization);
 
 		return new OidcAuthorizationCodeGrantAuthorization(authorization.getId(), authorization.getRegisteredClientId(),
 				authorization.getPrincipalName(), authorization.getAuthorizedScopes(), accessToken, refreshToken,
 				authorization.getAttribute(Principal.class.getName()),
 				authorization.getAttribute(OAuth2AuthorizationRequest.class.getName()), authorizationCode,
 				authorization.getAttribute(OAuth2ParameterNames.STATE), idToken);
+	}
+
+	static OidcAuthorizationPasswordGrantAuthorization convertOidcAuthorizationPasswordGrantAuthorization(
+			OAuth2Authorization authorization) {
+		OAuth2AuthorizationGrantAuthorization.AccessToken accessToken = extractAccessToken(authorization);
+		OAuth2AuthorizationGrantAuthorization.RefreshToken refreshToken = extractRefreshToken(authorization);
+		IdToken idToken = extractIdToken(authorization);
+
+		return new OidcAuthorizationPasswordGrantAuthorization(authorization.getId(), authorization.getRegisteredClientId(),
+				authorization.getPrincipalName(), authorization.getAuthorizedScopes(), accessToken, refreshToken,
+				authorization.getAttribute(Principal.class.getName()),
+				authorization.getAttribute(OAuth2AuthorizationRequest.class.getName()), idToken);
+	}
+
+	static OidcAuthorizationSmsGrantAuthorization convertOidcAuthorizationSmsGrantAuthorization(
+			OAuth2Authorization authorization) {
+		OAuth2AuthorizationGrantAuthorization.AccessToken accessToken = extractAccessToken(authorization);
+		OAuth2AuthorizationGrantAuthorization.RefreshToken refreshToken = extractRefreshToken(authorization);
+		IdToken idToken = extractIdToken(authorization);
+
+		return new OidcAuthorizationSmsGrantAuthorization(authorization.getId(), authorization.getRegisteredClientId(),
+				authorization.getPrincipalName(), authorization.getAuthorizedScopes(), accessToken, refreshToken,
+				authorization.getAttribute(Principal.class.getName()),
+				authorization.getAttribute(OAuth2AuthorizationRequest.class.getName()), idToken);
 	}
 
 	static OAuth2AuthorizationCodeGrantAuthorization convertOAuth2AuthorizationCodeGrantAuthorization(
@@ -109,6 +144,32 @@ final class ModelMapper {
 				authorization.getAttribute(Principal.class.getName()),
 				authorization.getAttribute(OAuth2AuthorizationRequest.class.getName()), authorizationCode,
 				authorization.getAttribute(OAuth2ParameterNames.STATE));
+	}
+
+	static OAuth2AuthorizationPasswordGrantAuthorization convertOAuth2AuthorizationPasswordGrantAuthorization(
+			OAuth2Authorization authorization) {
+
+		OAuth2AuthorizationGrantAuthorization.AccessToken accessToken = extractAccessToken(authorization);
+		OAuth2AuthorizationGrantAuthorization.RefreshToken refreshToken = extractRefreshToken(authorization);
+
+		return new OAuth2AuthorizationPasswordGrantAuthorization(authorization.getId(),
+				authorization.getRegisteredClientId(), authorization.getPrincipalName(),
+				authorization.getAuthorizedScopes(), accessToken, refreshToken,
+				authorization.getAttribute(Principal.class.getName()),
+				authorization.getAttribute(OAuth2AuthorizationRequest.class.getName()));
+	}
+
+	static OAuth2AuthorizationSmsGrantAuthorization convertOAuth2AuthorizationSmsGrantAuthorization(
+			OAuth2Authorization authorization) {
+
+		OAuth2AuthorizationGrantAuthorization.AccessToken accessToken = extractAccessToken(authorization);
+		OAuth2AuthorizationGrantAuthorization.RefreshToken refreshToken = extractRefreshToken(authorization);
+
+		return new OAuth2AuthorizationSmsGrantAuthorization(authorization.getId(),
+				authorization.getRegisteredClientId(), authorization.getPrincipalName(),
+				authorization.getAuthorizedScopes(), accessToken, refreshToken,
+				authorization.getAttribute(Principal.class.getName()),
+				authorization.getAttribute(OAuth2AuthorizationRequest.class.getName()));
 	}
 
 	static OAuth2ClientCredentialsGrantAuthorization convertOAuth2ClientCredentialsGrantAuthorization(
@@ -192,11 +253,11 @@ final class ModelMapper {
 		return refreshToken;
 	}
 
-	static OidcAuthorizationCodeGrantAuthorization.IdToken extractIdToken(OAuth2Authorization authorization) {
-		OidcAuthorizationCodeGrantAuthorization.IdToken idToken = null;
+	static IdToken extractIdToken(OAuth2Authorization authorization) {
+		IdToken idToken = null;
 		if (authorization.getToken(OidcIdToken.class) != null) {
 			OAuth2Authorization.Token<OidcIdToken> oidcIdToken = authorization.getToken(OidcIdToken.class);
-			idToken = new OidcAuthorizationCodeGrantAuthorization.IdToken(oidcIdToken.getToken().getTokenValue(),
+			idToken = new IdToken(oidcIdToken.getToken().getTokenValue(),
 					oidcIdToken.getToken().getIssuedAt(), oidcIdToken.getToken().getExpiresAt(),
 					oidcIdToken.isInvalidated(),
 					new OAuth2AuthorizationGrantAuthorization.ClaimsHolder(oidcIdToken.getClaims()));
@@ -438,7 +499,7 @@ final class ModelMapper {
 			.put(OAuth2Authorization.Token.INVALIDATED_METADATA_NAME, refreshToken.isInvalidated()));
 	}
 
-	static void mapIdToken(OidcAuthorizationCodeGrantAuthorization.IdToken idToken,
+	static void mapIdToken(IdToken idToken,
 			OAuth2Authorization.Builder builder) {
 		if (idToken == null) {
 			return;

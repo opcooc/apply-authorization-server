@@ -3,11 +3,9 @@ package org.springframework.security.oauth2.server.authorization.web.authenticat
 import jakarta.servlet.http.HttpServletRequest;
 import org.apply.core.AasConstant;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
-import org.springframework.security.oauth2.server.authorization.authentication.SmsCaptchaGrantAuthenticationToken;
+import org.springframework.security.oauth2.server.authorization.authentication.SmsGrantAuthenticationToken;
 import org.springframework.security.web.authentication.AuthenticationConverter;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
@@ -69,7 +67,7 @@ public class SmsGrantAuthenticationConverter implements AuthenticationConverter 
             }
         });
 
-        return new SmsCaptchaGrantAuthenticationToken(phone, smsCaptcha, requestedScopes, clientId, additionalParameters);
+        return new SmsGrantAuthenticationToken(phone, smsCaptcha, requestedScopes, clientId, additionalParameters);
     }
 
 }

@@ -13,7 +13,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
-import org.springframework.security.oauth2.core.*;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
+import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.OAuth2Error;
+import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
+import org.springframework.security.oauth2.core.OAuth2RefreshToken;
+import org.springframework.security.oauth2.core.OAuth2Token;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.oauth2.core.oidc.OidcIdToken;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
@@ -38,11 +45,24 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * 短信验证码登录认证提供者
+ *
+ * @author vains
+ */
 @Slf4j
-public final class PasswordGrantAuthenticationProvider implements AuthenticationProvider {
+public class SmsGrantAuthenticationProvider implements AuthenticationProvider {
 
     private static final String ERROR_URI = "https://datatracker.ietf.org/doc/html/rfc6749#section-5.2";
 
@@ -62,7 +82,7 @@ public final class PasswordGrantAuthenticationProvider implements Authentication
 
     private SessionRegistry sessionRegistry;
 
-    public PasswordGrantAuthenticationProvider(OAuth2AuthorizationService authorizationService,
+    public SmsGrantAuthenticationProvider(OAuth2AuthorizationService authorizationService,
                                                RegisteredClientRepository registeredClientRepository,
                                                AuthenticationManager authenticationManager,
                                                OAuth2TokenGenerator<? extends OAuth2Token> tokenGenerator) {
@@ -78,9 +98,9 @@ public final class PasswordGrantAuthenticationProvider implements Authentication
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        PasswordGrantAuthenticationToken passwordAuthenticationToken = (PasswordGrantAuthenticationToken) authentication;
+        SmsGrantAuthenticationToken smsGrantAuthenticationToken = (SmsGrantAuthenticationToken) authentication;
 
-        String clientId = passwordAuthenticationToken.getPrincipal().toString();
+        String clientId = smsGrantAuthenticationToken.getPrincipal().toString();
         RegisteredClient registeredClient = this.registeredClientRepository.findByClientId(clientId);
         if (registeredClient == null) {
             OAuth2Error error = new OAuth2Error(OAuth2ErrorCodes.INVALID_CLIENT,
@@ -89,7 +109,7 @@ public final class PasswordGrantAuthenticationProvider implements Authentication
             throw new OAuth2AuthenticationException(error);
         }
 
-        if (!registeredClient.getAuthorizationGrantTypes().contains(AasConstant.PASSWORD)) {
+        if (!registeredClient.getAuthorizationGrantTypes().contains(AasConstant.SMS)) {
             throw new OAuth2AuthenticationException(OAuth2ErrorCodes.UNAUTHORIZED_CLIENT);
         }
 
@@ -98,8 +118,8 @@ public final class PasswordGrantAuthenticationProvider implements Authentication
         }
 
         Set<String> authorizedScopes = registeredClient.getScopes();
-        if (!CollectionUtils.isEmpty(passwordAuthenticationToken.getScopes())) {
-            Set<String> unauthorizedScopes = passwordAuthenticationToken.getScopes().stream()
+        if (!CollectionUtils.isEmpty(smsGrantAuthenticationToken.getScopes())) {
+            Set<String> unauthorizedScopes = smsGrantAuthenticationToken.getScopes().stream()
                     .filter(requestedScope -> !registeredClient.getScopes().contains(requestedScope))
                     .collect(Collectors.toSet());
             if (!CollectionUtils.isEmpty(unauthorizedScopes)) {
@@ -107,7 +127,7 @@ public final class PasswordGrantAuthenticationProvider implements Authentication
                 throw new OAuth2AuthenticationException(error);
             }
 
-            authorizedScopes = new LinkedHashSet<>(passwordAuthenticationToken.getScopes());
+            authorizedScopes = new LinkedHashSet<>(smsGrantAuthenticationToken.getScopes());
         }
 
         if (this.logger.isTraceEnabled()) {
@@ -118,7 +138,7 @@ public final class PasswordGrantAuthenticationProvider implements Authentication
         try {
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
             UsernamePasswordAuthenticationToken authRequest = UsernamePasswordAuthenticationToken
-                    .unauthenticated(passwordAuthenticationToken.getUsername(), passwordAuthenticationToken.getPassword());
+                    .unauthenticated(smsGrantAuthenticationToken.getPhone(), smsGrantAuthenticationToken.getSmsCaptcha());
             authRequest.setDetails(this.authenticationDetailsSource.buildDetails(request));
             principal = authenticationManager.authenticate(authRequest);
         } catch (Exception e) {
@@ -131,8 +151,8 @@ public final class PasswordGrantAuthenticationProvider implements Authentication
                 .principal(principal)
                 .authorizationServerContext(AuthorizationServerContextHolder.getContext())
                 .authorizedScopes(authorizedScopes)
-                .authorizationGrantType(passwordAuthenticationToken.getGrantType())
-                .authorizationGrant(passwordAuthenticationToken);
+                .authorizationGrantType(smsGrantAuthenticationToken.getGrantType())
+                .authorizationGrant(smsGrantAuthenticationToken);
 
         OAuth2Authorization.Builder authorizationBuilder = OAuth2Authorization.withRegisteredClient(registeredClient)
                 // 存入授权scope
@@ -141,7 +161,7 @@ public final class PasswordGrantAuthenticationProvider implements Authentication
                 .principalName(principal.getName())
                 // 设置当前用户认证信息
                 .attribute(Principal.class.getName(), principal)
-                .authorizationGrantType(passwordAuthenticationToken.getGrantType());
+                .authorizationGrantType(smsGrantAuthenticationToken.getGrantType());
 
         // ----- Access token -----
         OAuth2TokenContext tokenContext = tokenContextBuilder.tokenType(OAuth2TokenType.ACCESS_TOKEN).build();
@@ -232,6 +252,7 @@ public final class PasswordGrantAuthenticationProvider implements Authentication
             this.logger.trace("Saved authorization");
         }
 
+
         Map<String, Object> additionalParameters = Collections.emptyMap();
         if (idToken != null) {
             additionalParameters = new HashMap<>();
@@ -251,7 +272,7 @@ public final class PasswordGrantAuthenticationProvider implements Authentication
 
     @Override
     public boolean supports(Class<?> authentication) {
-        return PasswordGrantAuthenticationToken.class.isAssignableFrom(authentication);
+        return SmsGrantAuthenticationToken.class.isAssignableFrom(authentication);
     }
 
     public void setSessionRegistry(SessionRegistry sessionRegistry) {
@@ -281,6 +302,4 @@ public final class PasswordGrantAuthenticationProvider implements Authentication
         byte[] digest = md.digest(value.getBytes(StandardCharsets.US_ASCII));
         return Base64.getUrlEncoder().withoutPadding().encodeToString(digest);
     }
-
 }
-

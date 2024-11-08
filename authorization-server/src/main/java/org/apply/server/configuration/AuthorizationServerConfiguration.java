@@ -5,22 +5,31 @@ import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
-import org.springframework.security.oauth2.server.authorization.web.authentication.DeviceClientAuthenticationConverter;
-import org.springframework.security.oauth2.server.authorization.authentication.DeviceClientAuthenticationProvider;
-import org.springframework.security.config.Customizer;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.apply.server.support.jose.Jwks;
 import org.apply.core.AasConstant;
+import org.apply.server.support.jose.Jwks;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
+import org.springframework.security.oauth2.server.authorization.authentication.DeviceClientAuthenticationProvider;
+import org.springframework.security.oauth2.server.authorization.authentication.PasswordGrantAuthenticationProvider;
+import org.springframework.security.oauth2.server.authorization.authentication.SmsGrantAuthenticationProvider;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
+import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenGenerator;
+import org.springframework.security.oauth2.server.authorization.web.authentication.DeviceClientAuthenticationConverter;
+import org.springframework.security.oauth2.server.authorization.web.authentication.PasswordGrantAuthenticationConverter;
+import org.springframework.security.oauth2.server.authorization.web.authentication.SmsGrantAuthenticationConverter;
+import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
@@ -39,6 +48,11 @@ public class AuthorizationServerConfiguration {
 
         httpConfigurer.authorizationEndpoint(customizer -> {
             customizer.consentPage(AasConstant.OAUTH_CONSENT_URI);
+        });
+
+        httpConfigurer.tokenEndpoint(customizer -> {
+            customizer.accessTokenRequestConverter(new PasswordGrantAuthenticationConverter());
+            customizer.accessTokenRequestConverter(new SmsGrantAuthenticationConverter());
         });
 
         httpConfigurer.oidc(Customizer.withDefaults());
@@ -72,7 +86,29 @@ public class AuthorizationServerConfiguration {
             customizer.jwt(Customizer.withDefaults());
         });
 
-        return http.build();
+        DefaultSecurityFilterChain result = http.build();
+
+        OAuth2TokenGenerator<?> tokenGenerator = http.getSharedObject(OAuth2TokenGenerator.class);
+        AuthenticationManager authenticationManager = http.getSharedObject(AuthenticationManager.class);
+        OAuth2AuthorizationService authorizationService = http.getSharedObject(OAuth2AuthorizationService.class);
+        SessionRegistry sessionRegistry = http.getSharedObject(SessionRegistry.class);
+
+        PasswordGrantAuthenticationProvider passwordGrantAuthenticationProvider = new PasswordGrantAuthenticationProvider(
+                authorizationService, registeredClientRepository, authenticationManager, tokenGenerator
+        );
+        SmsGrantAuthenticationProvider smsGrantAuthenticationProvider = new SmsGrantAuthenticationProvider(
+                authorizationService, registeredClientRepository, authenticationManager, tokenGenerator
+        );
+
+        if (sessionRegistry != null) {
+            passwordGrantAuthenticationProvider.setSessionRegistry(sessionRegistry);
+            smsGrantAuthenticationProvider.setSessionRegistry(sessionRegistry);
+        }
+
+        http.authenticationProvider(passwordGrantAuthenticationProvider);
+        http.authenticationProvider(smsGrantAuthenticationProvider);
+
+        return result;
     }
 
     @Bean
