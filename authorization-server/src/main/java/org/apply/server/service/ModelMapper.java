@@ -2,7 +2,7 @@ package org.apply.server.service;
 
 import java.security.Principal;
 
-import org.apply.core.AasConstant;
+import org.apply.core.SecurityConstants;
 import org.apply.server.entity.*;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
@@ -78,12 +78,12 @@ final class ModelMapper {
 		else if (AuthorizationGrantType.TOKEN_EXCHANGE.equals(authorization.getAuthorizationGrantType())) {
 			return convertOAuth2TokenExchangeGrantAuthorization(authorization);
 		}
-		else if (AasConstant.PASSWORD.equals(authorization.getAuthorizationGrantType())) {
+		else if (SecurityConstants.PASSWORD.equals(authorization.getAuthorizationGrantType())) {
 			return authorization.getAuthorizedScopes().contains(OidcScopes.OPENID)
 					? convertOidcAuthorizationPasswordGrantAuthorization(authorization)
 					: convertOAuth2AuthorizationPasswordGrantAuthorization(authorization);
 		}
-		else if (AasConstant.SMS.equals(authorization.getAuthorizationGrantType())) {
+		else if (SecurityConstants.SMS.equals(authorization.getAuthorizationGrantType())) {
 			return authorization.getAuthorizedScopes().contains(OidcScopes.OPENID)
 					? convertOidcAuthorizationSmsGrantAuthorization(authorization)
 					: convertOAuth2AuthorizationSmsGrantAuthorization(authorization);

@@ -1,7 +1,7 @@
 package org.springframework.security.oauth2.server.authorization.web.authentication;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.apply.core.AasConstant;
+import org.apply.core.SecurityConstants;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
@@ -22,7 +22,7 @@ public class SmsGrantAuthenticationConverter implements AuthenticationConverter 
     public Authentication convert(HttpServletRequest request) {
 
         String grantType = request.getParameter(OAuth2ParameterNames.GRANT_TYPE);
-        if (!AasConstant.SMS.getValue().equals(grantType)) {
+        if (!SecurityConstants.SMS.getValue().equals(grantType)) {
             return null;
         }
 
@@ -44,23 +44,23 @@ public class SmsGrantAuthenticationConverter implements AuthenticationConverter 
                     OAuth2EndpointUtils.ACCESS_TOKEN_REQUEST_ERROR_URI);
         }
 
-        String phone = parameters.getFirst(AasConstant.OAUTH_PARAMETER_NAME_PHONE);
-        if (!StringUtils.hasText(phone) || parameters.get(AasConstant.OAUTH_PARAMETER_NAME_PHONE).size() != 1) {
-            OAuth2EndpointUtils.throwError(OAuth2ErrorCodes.INVALID_REQUEST, AasConstant.OAUTH_PARAMETER_NAME_PHONE,
+        String phone = parameters.getFirst(SecurityConstants.OAUTH_PARAMETER_NAME_CONTACT);
+        if (!StringUtils.hasText(phone) || parameters.get(SecurityConstants.OAUTH_PARAMETER_NAME_CONTACT).size() != 1) {
+            OAuth2EndpointUtils.throwError(OAuth2ErrorCodes.INVALID_REQUEST, SecurityConstants.OAUTH_PARAMETER_NAME_CONTACT,
                     OAuth2EndpointUtils.ACCESS_TOKEN_REQUEST_ERROR_URI);
         }
 
-        String smsCaptcha = parameters.getFirst(AasConstant.OAUTH_PARAMETER_NAME_SMS_CAPTCHA);
-        if (!StringUtils.hasText(smsCaptcha) || parameters.get(AasConstant.OAUTH_PARAMETER_NAME_SMS_CAPTCHA).size() != 1) {
-            OAuth2EndpointUtils.throwError(OAuth2ErrorCodes.INVALID_REQUEST, AasConstant.OAUTH_PARAMETER_NAME_SMS_CAPTCHA,
+        String smsCaptcha = parameters.getFirst(SecurityConstants.OAUTH_PARAMETER_NAME_CAPTCHA);
+        if (!StringUtils.hasText(smsCaptcha) || parameters.get(SecurityConstants.OAUTH_PARAMETER_NAME_CAPTCHA).size() != 1) {
+            OAuth2EndpointUtils.throwError(OAuth2ErrorCodes.INVALID_REQUEST, SecurityConstants.OAUTH_PARAMETER_NAME_CAPTCHA,
                     OAuth2EndpointUtils.ACCESS_TOKEN_REQUEST_ERROR_URI);
         }
 
         Map<String, Object> additionalParameters = new HashMap<>();
         parameters.forEach((key, value) -> {
             if (!key.equals(OAuth2ParameterNames.GRANT_TYPE)
-                    && !key.equals(AasConstant.OAUTH_PARAMETER_NAME_PHONE)
-                    && !key.equals(AasConstant.OAUTH_PARAMETER_NAME_SMS_CAPTCHA)
+                    && !key.equals(SecurityConstants.OAUTH_PARAMETER_NAME_CONTACT)
+                    && !key.equals(SecurityConstants.OAUTH_PARAMETER_NAME_CAPTCHA)
                     && !key.equals(OAuth2ParameterNames.CLIENT_ID)
                     && !key.equals(OAuth2ParameterNames.SCOPE)) {
                 additionalParameters.put(key, (value.size() == 1) ? value.get(0) : value.toArray(new String[0]));

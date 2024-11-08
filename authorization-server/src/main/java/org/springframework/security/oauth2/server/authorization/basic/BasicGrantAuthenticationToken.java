@@ -1,4 +1,4 @@
-package org.springframework.security.oauth2.server.authorization.authentication;
+package org.springframework.security.oauth2.server.authorization.basic;
 
 import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CustomGrantAuthenticationToken extends AbstractAuthenticationToken {
+public class BasicGrantAuthenticationToken extends AbstractAuthenticationToken {
 
     private static final long serialVersionUID = SpringAuthorizationServerVersion.SERIAL_VERSION_UID;
 
@@ -20,8 +20,8 @@ public class CustomGrantAuthenticationToken extends AbstractAuthenticationToken 
 
     private final Map<String, Object> additionalParameters;
 
-    protected CustomGrantAuthenticationToken(AuthorizationGrantType authorizationGrantType,
-                                             String clientId, @Nullable Map<String, Object> additionalParameters) {
+    protected BasicGrantAuthenticationToken(AuthorizationGrantType authorizationGrantType,
+                                            String clientId, @Nullable Map<String, Object> additionalParameters) {
         super(Collections.emptyList());
         Assert.notNull(authorizationGrantType, "authorizationGrantType cannot be null");
         Assert.notNull(clientId, "clientId cannot be null");

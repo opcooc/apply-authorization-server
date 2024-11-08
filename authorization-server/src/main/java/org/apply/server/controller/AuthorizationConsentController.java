@@ -1,7 +1,7 @@
 package org.apply.server.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.apply.core.AasConstant;
+import org.apply.core.SecurityConstants;
 import org.apply.server.entity.BasicScope;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
@@ -25,7 +25,7 @@ public class AuthorizationConsentController {
     private final AuthorizationServerSettings authorizationServerSettings;
     private final RegisteredClientRepository registeredClientRepository;
 
-    @GetMapping(value = AasConstant.OAUTH_CONSENT_URI)
+    @GetMapping(value = SecurityConstants.OAUTH_CONSENT_URI)
     public String consent(Authentication authentication, Model model,
                           @RequestParam(OAuth2ParameterNames.CLIENT_ID) String clientId,
                           @RequestParam(OAuth2ParameterNames.SCOPE) String scope,

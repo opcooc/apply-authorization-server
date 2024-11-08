@@ -6,7 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apply.core.AasConstant;
+import org.apply.core.SecurityConstants;
 import org.springframework.core.log.LogMessage;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -21,7 +21,7 @@ public class PreCaptchaVerifyFilter implements Filter {
 
     private static final OrRequestMatcher DEFAULT_ANT_PATH_REQUEST_MATCHER =
             new OrRequestMatcher(
-                    AntPathRequestMatcher.antMatcher(HttpMethod.POST, AasConstant.OAUTH_LOGIN_URI)
+                    AntPathRequestMatcher.antMatcher(HttpMethod.POST, SecurityConstants.OAUTH_LOGIN_URI)
                     // ....
             );
 
@@ -35,7 +35,7 @@ public class PreCaptchaVerifyFilter implements Filter {
             chain.doFilter(request, response);
             return;
         }
-        String pcvId = request.getParameter(AasConstant.PRE_CAPTCHA_VERIFY_PARAM);
+        String pcvId = request.getParameter(SecurityConstants.PRE_CAPTCHA_VERIFY_PARAM);
         pcvId = (pcvId != null) ? pcvId.trim() : "";
 
         if (this.logger.isDebugEnabled()) {

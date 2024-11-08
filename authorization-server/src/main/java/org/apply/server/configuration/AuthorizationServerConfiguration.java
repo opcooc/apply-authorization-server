@@ -5,22 +5,26 @@ import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
-import org.apply.core.AasConstant;
+import org.apply.core.SecurityConstants;
 import org.apply.server.support.jose.Jwks;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.authentication.DeviceClientAuthenticationProvider;
 import org.springframework.security.oauth2.server.authorization.authentication.PasswordGrantAuthenticationProvider;
 import org.springframework.security.oauth2.server.authorization.authentication.SmsGrantAuthenticationProvider;
+import org.springframework.security.oauth2.server.authorization.basic.BasicAuthenticationProvider;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
@@ -47,7 +51,7 @@ public class AuthorizationServerConfiguration {
         OAuth2AuthorizationServerConfigurer httpConfigurer = http.getConfigurer(OAuth2AuthorizationServerConfigurer.class);
 
         httpConfigurer.authorizationEndpoint(customizer -> {
-            customizer.consentPage(AasConstant.OAUTH_CONSENT_URI);
+            customizer.consentPage(SecurityConstants.OAUTH_CONSENT_URI);
         });
 
         httpConfigurer.tokenEndpoint(customizer -> {
@@ -58,11 +62,11 @@ public class AuthorizationServerConfiguration {
         httpConfigurer.oidc(Customizer.withDefaults());
 
         httpConfigurer.deviceAuthorizationEndpoint(customizer -> {
-            customizer.verificationUri(AasConstant.OAUTH_ACTIVATE_URI);
+            customizer.verificationUri(SecurityConstants.OAUTH_ACTIVATE_URI);
         });
 
         httpConfigurer.deviceVerificationEndpoint(customizer -> {
-            customizer.consentPage(AasConstant.OAUTH_CONSENT_URI);
+            customizer.consentPage(SecurityConstants.OAUTH_CONSENT_URI);
         });
 
         DeviceClientAuthenticationConverter DeviceClientAuthenticationConverter =
@@ -77,7 +81,7 @@ public class AuthorizationServerConfiguration {
 
         http.exceptionHandling(customizer -> {
             customizer.defaultAuthenticationEntryPointFor(
-                    new LoginUrlAuthenticationEntryPoint(AasConstant.OAUTH_LOGIN_URI),
+                    new LoginUrlAuthenticationEntryPoint(SecurityConstants.OAUTH_LOGIN_URI),
                     new MediaTypeRequestMatcher(MediaType.TEXT_HTML)
             );
         });
@@ -109,6 +113,13 @@ public class AuthorizationServerConfiguration {
         http.authenticationProvider(smsGrantAuthenticationProvider);
 
         return result;
+    }
+
+    @Bean
+    public BasicAuthenticationProvider customAuthenticationProvider(UserDetailsService userDetailsService,
+                                                                    PasswordEncoder passwordEncoder,
+                                                                    StringRedisTemplate redisTemplate) {
+        return new BasicAuthenticationProvider(userDetailsService, passwordEncoder, redisTemplate);
     }
 
     @Bean

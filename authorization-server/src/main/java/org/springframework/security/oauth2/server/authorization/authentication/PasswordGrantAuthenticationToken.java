@@ -1,8 +1,9 @@
 package org.springframework.security.oauth2.server.authorization.authentication;
 
 import lombok.Getter;
-import org.apply.core.AasConstant;
+import org.apply.core.SecurityConstants;
 import org.springframework.lang.Nullable;
+import org.springframework.security.oauth2.server.authorization.basic.BasicGrantAuthenticationToken;
 import org.springframework.util.Assert;
 
 import java.util.Collections;
@@ -11,7 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Getter
-public class PasswordGrantAuthenticationToken extends CustomGrantAuthenticationToken {
+public class PasswordGrantAuthenticationToken extends BasicGrantAuthenticationToken {
 
     private final String username;
     private String password;
@@ -19,7 +20,7 @@ public class PasswordGrantAuthenticationToken extends CustomGrantAuthenticationT
 
     public PasswordGrantAuthenticationToken(String username, String password, Set<String> scopes, String clientId,
                                             @Nullable Map<String, Object> additionalParameters) {
-        super(AasConstant.PASSWORD, clientId, additionalParameters);
+        super(SecurityConstants.PASSWORD, clientId, additionalParameters);
         Assert.hasText(username, "username cannot be empty");
         Assert.hasText(password, "password cannot be empty");
         this.username = username;

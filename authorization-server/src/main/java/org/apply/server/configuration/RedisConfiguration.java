@@ -1,7 +1,7 @@
 package org.apply.server.configuration;
 
 
-import org.apply.core.AasConstant;
+import org.apply.core.SecurityConstants;
 import org.apply.server.convert.*;
 import org.apply.server.repository.OAuth2AuthorizationGrantAuthorizationRepository;
 import org.apply.server.repository.OAuth2RegisteredClientRepository;
@@ -14,7 +14,6 @@ import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 
@@ -59,16 +58,16 @@ public class RedisConfiguration {
 
         RegisteredClient messagingClient = RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientId("HG1795347877071736834")
-                .clientSecret(AasConstant.PASSWORD_ENCODER.encode("0b935bd0f1f3e27090812129a6ff04cf"))
+                .clientSecret(SecurityConstants.PASSWORD_ENCODER.encode("0b935bd0f1f3e27090812129a6ff04cf"))
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
                 .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-                .authorizationGrantType(AasConstant.PASSWORD)
-                .authorizationGrantType(AasConstant.SMS)
 
                 .clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
                 .authorizationGrantType(AuthorizationGrantType.DEVICE_CODE)
+                .authorizationGrantType(SecurityConstants.PASSWORD)
+                .authorizationGrantType(SecurityConstants.SMS)
 
                 .redirectUri("http://127.0.0.1:8080/login/oauth2/code/messaging-client-oidc")
                 .redirectUri("http://127.0.0.1:8080/authorized")

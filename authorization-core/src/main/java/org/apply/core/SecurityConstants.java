@@ -4,7 +4,7 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 
-public class AasConstant {
+public class SecurityConstants {
 
     public static final PasswordEncoder PASSWORD_ENCODER = PasswordEncoderFactories.createDelegatingPasswordEncoder();
     public static final AuthorizationGrantType PASSWORD = new AuthorizationGrantType("urn:ietf:params:oauth:grant-type:password");
@@ -19,8 +19,13 @@ public class AasConstant {
 
     public static final String PRE_CAPTCHA_VERIFY_PARAM = "pcv_id";
 
-    public static final String OAUTH_PARAMETER_NAME_PHONE = "phone";
+    public static final String OAUTH_PARAMETER_NAME_CONTACT = "contact";
 
-    public static final String OAUTH_PARAMETER_NAME_SMS_CAPTCHA = "sms_captcha";
+    public static final String OAUTH_PARAMETER_NAME_CAPTCHA = "captcha";
+
+    public static final String CAPTCHA_ID_NAME = "captchaId";
+
+    public static final String OAUTH_PARAMETER_NAME_LOGIN_TYPE = "login_type";
+    public static final String CONTACT_LOGIN_TYPE = "login_contact";
 
 }

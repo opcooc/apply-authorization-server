@@ -4,7 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apply.core.AasConstant;
+import org.apply.core.SecurityConstants;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -89,7 +89,7 @@ public final class PasswordGrantAuthenticationProvider implements Authentication
             throw new OAuth2AuthenticationException(error);
         }
 
-        if (!registeredClient.getAuthorizationGrantTypes().contains(AasConstant.PASSWORD)) {
+        if (!registeredClient.getAuthorizationGrantTypes().contains(SecurityConstants.PASSWORD)) {
             throw new OAuth2AuthenticationException(OAuth2ErrorCodes.UNAUTHORIZED_CLIENT);
         }
 

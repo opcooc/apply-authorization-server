@@ -1,7 +1,7 @@
 package org.springframework.security.oauth2.server.authorization.web.authentication;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.apply.core.AasConstant;
+import org.apply.core.SecurityConstants;
 import org.springframework.lang.Nullable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
@@ -24,7 +24,7 @@ public class PasswordGrantAuthenticationConverter implements AuthenticationConve
     public Authentication convert(HttpServletRequest request) {
 
         String grantType = request.getParameter(OAuth2ParameterNames.GRANT_TYPE);
-        if (!AasConstant.PASSWORD.getValue().equals(grantType)) {
+        if (!SecurityConstants.PASSWORD.getValue().equals(grantType)) {
             return null;
         }
 

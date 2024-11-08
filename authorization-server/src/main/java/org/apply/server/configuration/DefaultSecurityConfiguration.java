@@ -1,6 +1,6 @@
 package org.apply.server.configuration;
 
-import org.apply.core.AasConstant;
+import org.apply.core.SecurityConstants;
 import org.apply.core.userdetails.AasUser;
 import org.apply.server.event.AuthenticationEventListener;
 import org.apply.server.support.filter.PreCaptchaVerifyFilter;
@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -26,21 +27,21 @@ public class DefaultSecurityConfiguration {
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http, SessionRegistry sessionRegistry) throws Exception {
 
         http.authorizeHttpRequests(customizer -> {
-            customizer.requestMatchers("/assets/**", AasConstant.OAUTH_LOGIN_URI)
+            customizer.requestMatchers("/assets/**", SecurityConstants.OAUTH_LOGIN_URI)
                     .permitAll()
                     .anyRequest()
                     .authenticated();
         });
 
         http.formLogin(customizer -> {
-            customizer.loginPage(AasConstant.OAUTH_LOGIN_URI);
-            customizer.failureForwardUrl(AasConstant.OAUTH_LOGIN_URI);
+            customizer.loginPage(SecurityConstants.OAUTH_LOGIN_URI);
+            customizer.failureForwardUrl(SecurityConstants.OAUTH_LOGIN_URI);
         });
 
         http.sessionManagement(sessionManagement -> sessionManagement.sessionConcurrency(sessionConcurrency -> {
             sessionConcurrency.maximumSessions(1);
             sessionConcurrency.sessionRegistry(sessionRegistry);
-            sessionConcurrency.expiredUrl(AasConstant.OAUTH_LOGIN_URI);
+            sessionConcurrency.expiredUrl(SecurityConstants.OAUTH_LOGIN_URI);
         }));
 
         http.logout(Customizer.withDefaults());
@@ -48,6 +49,11 @@ public class DefaultSecurityConfiguration {
         http.addFilterBefore(new PreCaptchaVerifyFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return SecurityConstants.PASSWORD_ENCODER;
     }
 
     @Bean
@@ -60,7 +66,7 @@ public class DefaultSecurityConfiguration {
         AasUser user = new AasUser();
         user.setUserId("userId");
         user.setUsername("user1");
-        user.setPassword(AasConstant.PASSWORD_ENCODER.encode("password"));
+        user.setPassword(SecurityConstants.PASSWORD_ENCODER.encode("password"));
         user.setAuthorities(Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
         return new InMemoryUserDetailsManager(user);
     }
